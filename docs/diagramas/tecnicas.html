@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#fff;font-family:"Segoe UI",Arial,sans-serif}</style></head><body>
+<svg id="fig" xmlns="http://www.w3.org/2000/svg" width="1100" height="720" viewBox="0 0 1100 720"></svg>
+<script>
+const svg=document.getElementById('fig');const NS='http://www.w3.org/2000/svg';
+const X=t=>170+t*88; // t 0..10
+function el(n,a,txt){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;svg.appendChild(e);return e;}
+const defs=el('defs',{});
+function marker(id,c){const m=document.createElementNS(NS,'marker');m.setAttribute('id',id);m.setAttribute('viewBox','0 0 10 10');m.setAttribute('refX','9');m.setAttribute('refY','5');m.setAttribute('markerWidth','7');m.setAttribute('markerHeight','7');m.setAttribute('orient','auto-start-reverse');const p=document.createElementNS(NS,'path');p.setAttribute('d','M0,0 L10,5 L0,10 z');p.setAttribute('fill',c);m.appendChild(p);defs.appendChild(m);}
+marker('a','#0f766e');marker('b','#c2410c');marker('g','#94a3b8');
+const panels=[
+ {t:'Polling',d:'peticiones a intervalos fijos; la mayoría vuelven vacías'},
+ {t:'Long polling',d:'el servidor retiene la petición hasta tener datos'},
+ {t:'Server-Sent Events',d:'una respuesta HTTP abierta; solo servidor → cliente'},
+ {t:'WebSocket',d:'un handshake y luego marcos en ambas direcciones'}];
+const H=170, top0=30;
+panels.forEach((p,i)=>{
+ const y=top0+i*H, yc=y+40, ys=y+120;
+ el('rect',{x:10,y:y,width:1080,height:H-14,rx:12,fill:i%2?'#fbfaf7':'#f3f8f7',stroke:'#e2e8e6'});
+ el('text',{x:24,y:y+26,'font-size':16,'font-weight':700,fill:'#12302e'},p.t);
+ el('text',{x:24,y:y+46,'font-size':12,fill:'#5b6b67'},'');
+ const d=el('text',{x:24,y:y+148,'font-size':12.5,fill:'#5b6b67','font-style':'italic'},p.d);
+ el('text',{x:100,y:yc+4,'font-size':12.5,'text-anchor':'end',fill:'#334155'},'Cliente');
+ el('text',{x:100,y:ys+4,'font-size':12.5,'text-anchor':'end',fill:'#334155'},'Servidor');
+ el('line',{x1:110,y1:yc,x2:1075,y2:yc,stroke:'#94a3b8','stroke-width':1.5});
+ el('line',{x1:110,y1:ys,x2:1075,y2:ys,stroke:'#94a3b8','stroke-width':1.5});
+ // data events on server
+ [3.2,6.5].forEach(t=>{el('circle',{cx:X(t),cy:ys,r:6,fill:'#f59e0b'});el('text',{x:X(t),y:ys+22,'font-size':11,'text-anchor':'middle',fill:'#92400e'},'dato nuevo');});
+ const up=(t1,t2,c='a',dash)=>el('line',{x1:X(t1),y1:yc+3,x2:X(t2),y2:ys-4,stroke:c==='a'?'#0f766e':c==='b'?'#c2410c':'#94a3b8','stroke-width':2,'marker-end':`url(#${c})`,...(dash?{'stroke-dasharray':'5 4'}:{})});
+ const dn=(t1,t2,c='b',w=2)=>el('line',{x1:X(t1),y1:ys-3,x2:X(t2),y2:yc+4,stroke:c==='b'?'#c2410c':c==='a'?'#0f766e':'#94a3b8','stroke-width':w,'marker-end':`url(#${c})`});
+ if(i===0){[0,2,4,6,8].forEach(t=>{up(t,t+0.35);const has=(t===4||t===8);dn(t+0.4,t+0.75,has?'b':'g');el('text',{x:X(t+0.55),y:yc-8,'font-size':10.5,'text-anchor':'middle',fill:has?'#c2410c':'#94a3b8'},has?'datos':'vacío');});
+}
+ if(i===1){up(0,0.35);el('line',{x1:X(0.35),y1:ys-14,x2:X(3.2),y2:ys-14,stroke:'#0f766e','stroke-width':1.2,'stroke-dasharray':'2 3'});el('text',{x:X(1.8),y:ys-20,'font-size':10.5,'text-anchor':'middle',fill:'#0f766e'},'petición retenida');
+   dn(3.2,3.55);up(3.65,4.0);el('line',{x1:X(4.0),y1:ys-14,x2:X(6.5),y2:ys-14,stroke:'#0f766e','stroke-width':1.2,'stroke-dasharray':'2 3'});dn(6.5,6.85);up(6.95,7.3);
+   el('text',{x:X(3.4),y:yc-8,'font-size':10.5,'text-anchor':'middle',fill:'#c2410c'},'respuesta + nueva petición');}
+ if(i===2){up(0,0.35);el('text',{x:X(0.5),y:yc+70,'font-size':10.5,'text-anchor':'start',fill:'#0f766e'},'GET text/event-stream');
+   el('rect',{x:X(0.4),y:ys-30,width:X(10)-X(0.4),height:8,rx:4,fill:'#fed7aa'});el('text',{x:X(7.2),y:ys-36,'font-size':10.5,fill:'#c2410c'},'respuesta HTTP que no termina');
+   dn(3.2,3.5);dn(6.5,6.8);up(5,5.35,'a',true);el('text',{x:X(5.15),y:yc-8,'font-size':10.5,'text-anchor':'middle',fill:'#0f766e'},'cliente→servidor: otro POST');}
+ if(i===3){up(0,0.3);dn(0.35,0.65,'a');el('text',{x:X(0.35),y:yc-8,'font-size':10.5,'text-anchor':'middle',fill:'#0f766e'},'Upgrade → 101');
+   el('rect',{x:X(0.7),y:yc+8,width:X(10)-X(0.7),height:ys-yc-16,rx:6,fill:'#ccfbf1',opacity:.45});
+   el('text',{x:X(8.6),y:(yc+ys)/2+4,'font-size':11,'text-anchor':'middle',fill:'#0f766e'},'conexión TCP abierta (full-duplex)');
+   dn(3.2,3.4);dn(6.5,6.7);up(5,5.2,'a');up(2,2.2,'a');dn(2.25,2.45,'b',1.4);
+   el('text',{x:X(3.3),y:yc-8,'font-size':10.5,'text-anchor':'middle',fill:'#c2410c'},'push inmediato');
+   el('text',{x:X(5.1),y:yc-8,'font-size':10.5,'text-anchor':'middle',fill:'#0f766e'},'mensaje del cliente');}
+});
+el('text',{x:550,y:20,'font-size':12,'text-anchor':'middle',fill:'#5b6b67'},'tiempo →     (el círculo naranja indica cuándo el servidor tiene un dato nuevo)');
+</script></body></html>

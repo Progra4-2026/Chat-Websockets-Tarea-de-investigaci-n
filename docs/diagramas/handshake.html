@@ -1,0 +1,29 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#fff;font-family:"Segoe UI",Arial,sans-serif}</style></head><body>
+<svg id="fig" xmlns="http://www.w3.org/2000/svg" width="1000" height="660" viewBox="0 0 1000 660"></svg>
+<script>
+const svg=document.getElementById('fig');const NS='http://www.w3.org/2000/svg';
+function el(n,a,txt){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;svg.appendChild(e);return e;}
+const defs=el('defs',{});
+['#0f766e','#c2410c','#64748b'].forEach((c,i)=>{const m=document.createElementNS(NS,'marker');m.setAttribute('id','m'+i);m.setAttribute('viewBox','0 0 10 10');m.setAttribute('refX','9');m.setAttribute('refY','5');m.setAttribute('markerWidth','8');m.setAttribute('markerHeight','8');m.setAttribute('orient','auto');const p=document.createElementNS(NS,'path');p.setAttribute('d','M0,0 L10,5 L0,10 z');p.setAttribute('fill',c);m.appendChild(p);defs.appendChild(m);});
+const CX=180, SX=820;
+[[CX,'Navegador (cliente)'],[SX,'Servidor ws']].forEach(([x,t])=>{el('rect',{x:x-110,y:10,width:220,height:40,rx:10,fill:'#12302e'});el('text',{x,y:36,'text-anchor':'middle',fill:'#fff','font-size':15,'font-weight':600},t);el('line',{x1:x,y1:50,x2:x,y2:648,stroke:'#cbd5e1','stroke-width':2,'stroke-dasharray':'6 5'});});
+function phase(y,h,label,fill){el('rect',{x:20,y,width:960,height:h,rx:10,fill,opacity:.55});el('text',{x:30,y:y+18,'font-size':12,'font-weight':700,fill:'#334155'},label);}
+phase(62,190,'1 · Handshake de apertura (HTTP/1.1)','#e0f2fe');
+phase(258,282,'2 · Transferencia de datos (marcos / frames)','#dcfce7');
+phase(546,104,'3 · Cierre','#fee2e2');
+let y=0;
+function msg(y,dir,lines,ci=0,mono=true){const x1=dir>0?CX:SX,x2=dir>0?SX:CX;el('line',{x1,y1:y,x2:x2-(dir>0?4:-4),y2:y,stroke:['#0f766e','#c2410c','#64748b'][ci],'stroke-width':2.2,'marker-end':`url(#m${ci})`});
+ lines.forEach((l,i)=>el('text',{x:(CX+SX)/2,y:y-8-(lines.length-1-i)*15,'text-anchor':'middle','font-size':12.2,'font-family':mono?'Consolas,monospace':'inherit',fill:'#1e293b'},l));}
+msg(160,1,['GET /ws HTTP/1.1','Upgrade: websocket · Connection: Upgrade','Origin: http://localhost:3000','Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==','Sec-WebSocket-Version: 13']);
+el('text',{x:SX-10,y:182,'font-size':11.5,'text-anchor':'end',fill:'#475569'},'verifyClient: Origin ✓');
+el('text',{x:SX-10,y:197,'font-size':11.5,'text-anchor':'end',fill:'#475569'},'SHA-1(key + GUID) → base64');
+msg(238,-1,['HTTP/1.1 101 Switching Protocols','Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo='],0);
+msg(300,-1,['marco texto 0x81 · {"event":"system:welcome",…}'],1);
+msg(345,1,['marco texto enmascarado · {"event":"user:join","data":{"user":"Ana",…}}'],0);
+msg(390,-1,['0x81 · chat:history · system:info · room:users'],1);
+msg(435,1,['{"event":"chat:message","data":{"text":"Hola, grupo"}}'],0);
+msg(480,-1,['broadcast a la sala · {"event":"chat:message",…}'],1);
+msg(528,-1,['ping (0x9) cada 30 s ⇄ pong (0xA) automático'],2,false);
+msg(598,1,['marco de cierre 0x8 · código 1000 "Cierre del usuario"'],2);
+msg(636,-1,['marco de cierre 0x8 (eco) → se cierra TCP'],2);
+</script></body></html>
