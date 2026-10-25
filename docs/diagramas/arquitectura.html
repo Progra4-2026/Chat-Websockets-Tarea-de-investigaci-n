@@ -1,0 +1,54 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:#fff}
+#fig{width:1100px;padding:24px;box-sizing:border-box}
+.row{display:grid;grid-template-columns:250px 1fr 250px;gap:0;align-items:stretch}
+.box{border:2px solid #0f766e;border-radius:14px;padding:14px 16px;background:#f0f9f7}
+.box h3{margin:0 0 4px;font-size:17px;color:#12302e}
+.box .sub{font-size:12.5px;color:#4b5b58;margin-bottom:10px}
+.server{background:#12302e;color:#e6f2ef;border-color:#12302e}
+.server h3{color:#fff}.server .sub{color:#9cc3bc}
+.mod{background:#1d4744;border-radius:8px;padding:7px 10px;margin:6px 0;font-size:13px}
+.mod b{color:#5eead4;font-family:Consolas,monospace;font-weight:600}
+.ev{font-family:Consolas,monospace;font-size:12.5px;line-height:1.7}
+.ev .out{color:#0f766e}.ev .in{color:#9a3412}
+.mid{display:flex;flex-direction:column;justify-content:center;padding:0 10px}
+.arrows{display:flex;flex-direction:column;gap:10px;justify-content:center;height:100%;padding:0 6px}
+.arr{font-size:11.5px;font-family:Consolas,monospace;color:#334;text-align:center}
+.line{height:0;border-top:2px solid #0f766e;position:relative;margin:3px 0}
+.line.r::after{content:"";position:absolute;right:-2px;top:-7px;border:6px solid transparent;border-left:9px solid #0f766e}
+.line.l::before{content:"";position:absolute;left:-2px;top:-7px;border:6px solid transparent;border-right:9px solid #0f766e}
+.line.b{border-top-style:dashed;border-color:#9a3412}
+.line.b.l::before{border-right-color:#9a3412}.line.b.r::after{border-left-color:#9a3412}
+.grid{display:grid;grid-template-columns:250px 110px 1fr 110px 250px;align-items:stretch}
+.legend{margin-top:14px;font-size:12.5px;color:#4b5b58;display:flex;gap:22px;justify-content:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:26px;height:0;border-top:2px solid #0f766e;display:inline-block}.sw.b{border-top:2px dashed #9a3412}
+.http{margin-top:12px;border:1.5px dashed #9fb3af;border-radius:10px;padding:8px 12px;font-size:12.5px;color:#4b5b58;text-align:center}
+</style></head><body><div id="fig">
+<div class="grid">
+  <div class="box"><h3>Cliente 1 (navegador)</h3><div class="sub">HTML + CSS + JS · API WebSocket nativa<br>socket-client.js / app.js</div>
+    <div class="ev"><div class="out">▲ user:join</div><div class="out">▲ chat:message</div><div class="out">▲ user:typing</div><div class="out">▲ user:leave</div>
+    <div class="in">▼ system:welcome</div><div class="in">▼ chat:history</div><div class="in">▼ chat:message</div><div class="in">▼ user:join / user:leave</div><div class="in">▼ room:users · system:info</div><div class="in">▼ error</div></div></div>
+  <div class="arrows">
+    <div class="arr">JSON {event,data}</div><div class="line r"></div>
+    <div class="arr" style="margin-top:22px">broadcast</div><div class="line b l"></div>
+    <div class="arr" style="margin-top:22px">ping / pong</div><div class="line r l" style="border-top-style:dotted"></div>
+  </div>
+  <div class="box server"><h3>Servidor Node.js · ws://localhost:3000</h3><div class="sub">Un solo puerto: HTTP para los archivos estáticos y Upgrade a WebSocket en /ws</div>
+    <div class="mod"><b>server.js</b> · GET / → index.html, css, js · /health</div>
+    <div class="mod"><b>verifyClient</b> · handshake: valida Origin y límite por IP → 101 o 403/429</div>
+    <div class="mod"><b>protocol.js</b> · JSON.parse + validación del esquema por evento</div>
+    <div class="mod"><b>chatServer.js</b> · enruta el evento a su manejador · rate limit</div>
+    <div class="mod"><b>rooms.js</b> · salas: general · programacion-4 · proyectos<br>miembros, historial (50) y broadcast</div>
+  </div>
+  <div class="arrows">
+    <div class="arr">JSON {event,data}</div><div class="line l"></div>
+    <div class="arr" style="margin-top:22px">broadcast</div><div class="line b r"></div>
+    <div class="arr" style="margin-top:22px">ping / pong</div><div class="line r l" style="border-top-style:dotted"></div>
+  </div>
+  <div class="box"><h3>Cliente 2 (navegador)</h3><div class="sub">Misma página, otra pestaña, otro navegador u otro dispositivo</div>
+    <div class="ev"><div class="out">▲ user:join</div><div class="out">▲ chat:message</div><div class="out">▲ user:typing</div><div class="out">▲ user:leave</div>
+    <div class="in">▼ system:welcome</div><div class="in">▼ chat:history</div><div class="in">▼ chat:message</div><div class="in">▼ user:join / user:leave</div><div class="in">▼ room:users · system:info</div><div class="in">▼ error</div></div></div>
+</div>
+<div class="legend"><span><i class="sw"></i>Cliente → Servidor (▲)</span><span><i class="sw b"></i>Servidor → Clientes de la sala (▼)</span><span>Una conexión TCP persistente por cliente, full-duplex</span></div>
+</div></body></html>
